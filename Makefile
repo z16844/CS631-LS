@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror -Wextra -std=c99
+CFLAGS=-Wall -Werror -Wextra -std=c99 -g
 OBJS=parameters.o main.o 
 TARGET=ls
 

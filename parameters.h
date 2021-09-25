@@ -3,7 +3,7 @@
 #ifndef _PARAMETERS_H_
 #define _PARAMETERS_H_
 
-struct Flags
+struct _OPTIONS
 {
 	bool ListAllEntries;				  // -A
 	bool IncludeDirectoryEntries;			  // -a
@@ -26,14 +26,19 @@ struct Flags
 	bool ForceRawPrintingOfNonPrintable;		  // -w
 	char *SpecifiedPath;
 };
+typedef struct _OPTIONS OPTIONS;
+typedef struct _OPTIONS *POPTIONS;
 
-struct Flags
+POPTIONS
 _get_empty_container();
 
 int
-resolve_path(const char *input_path, char *resolved);
+resolve_path(const char *input_path, POPTIONS resolved);
 
-struct Flags
+OPTIONS
 parse_arguments(int argc, char *argv[]);
+
+int
+map_options(const POPTIONS container, char *argv);
 
 #endif /* !_PARAMETERS_H_ */

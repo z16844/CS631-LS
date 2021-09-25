@@ -76,39 +76,65 @@ map_options(const POPTIONS container, char *argv)
 		switch (argv[len]) {
 		case 'A':
 			container->ListAllEntries = true;
+			TO_STDOUT("[MAP] ListAllEntries(-A): %d\n",
+				  container->ListAllEntries);
 			break;
 		case 'a':
 			container->IncludeDirectoryEntries = true;
+			TO_STDOUT("[MAP] IncludeDirectoryEntries(-a): %d\n",
+				  container->IncludeDirectoryEntries);
 			break;
 		case 'c':
 			container->UseLastFileStatusChangeTime = true;
+			TO_STDOUT("[MAP] UseLastFileStatusChangeTime(-c): %d\n",
+				  container->UseLastFileStatusChangeTime);
 			break;
 		case 'd':
 			container->DirectoriesAsPlainFiles = true;
+			TO_STDOUT("[MAP] DirectoriesAsPlainFiles(-d): %d\n",
+				  container->DirectoriesAsPlainFiles);
 			break;
 		case 'F':
 			container->WithTypeSymbols = true;
+			TO_STDOUT("[MAP] WithTypeSymbols(-F): %d\n",
+				  container->WithTypeSymbols);
 			break;
 		case 'f':
 			container->NotSortedOutput = true;
+			TO_STDOUT("[MAP] NotSortedOutput(-f): %d\n",
+				  container->NotSortedOutput);
 			break;
 		case 'h':
 			container->HumanReadableFormat = true;
+			TO_STDOUT("[MAP] HumanReadableFormat(-h): %d\n",
+				  container->HumanReadableFormat);
 			break;
 		case 'i':
 			container->ShowInodeNumber = true;
+			TO_STDOUT("[MAP] ShowInodeNumber(-i): %d\n",
+				  container->ShowInodeNumber);
 			break;
 		case 'k':
 			container->OverrideSizeFormatAsKb = true;
+			TO_STDOUT("[MAP] OverrideSizeFormatAsKb(-k): %d\n",
+				  container->OverrideSizeFormatAsKb);
 			break;
 		case 'l':
 			container->ListInLongFormat = true;
+			TO_STDOUT("[MAP] ListInLongFormat(-l): %d\n",
+				  container->ListInLongFormat);
 			break;
 		case 'n':
 			container->ShowAsUidAndGid = true;
+			TO_STDOUT("[MAP] ShowAsUidAndGid(-n): %d\n",
+				  container->ShowAsUidAndGid);
 			break;
 		case 'q':
 			container->ForceDisplayingNonPrintableLetters = true;
+			TO_STDOUT(
+			    "[MAP] ForceDisplayingNonPrintableLetters(-q): "
+			    "%d\n",
+			    container->ForceDisplayingNonPrintableLetters);
 			break;
 		case 'R':
 			container->ListRecursivelySubDirectoriesEncountered =
@@ -116,21 +142,36 @@ map_options(const POPTIONS container, char *argv)
 			break;
 		case 'r':
 			container->ReverseTheLexicographicalOrder = true;
+			TO_STDOUT(
+			    "[MAP] ReverseTheLexicographicalOrder(-r): %d\n",
+			    container->ReverseTheLexicographicalOrder);
 			break;
 		case 'S':
 			container->OrderBySize = true;
+			TO_STDOUT("[MAP] OrderBySize(-S): %d\n",
+				  container->OrderBySize);
 			break;
 		case 's':
 			container->DisplayByBlockSize = true;
+			TO_STDOUT("[MAP] DisplayByBlockSize(-s): %d\n",
+				  container->DisplayByBlockSize);
 			break;
 		case 't':
 			container->OrderByLastModifiedAscending = true;
+			TO_STDOUT(
+			    "[MAP] OrderByLastModifiedAscending(-t): %d\n",
+			    container->OrderByLastModifiedAscending);
 			break;
 		case 'u':
 			container->SortByLastAccess = true;
+			TO_STDOUT("[MAP] SortByLastAccess(-u): %d\n",
+				  container->SortByLastAccess);
 			break;
 		case 'w':
 			container->ForceRawPrintingOfNonPrintable = true;
+			TO_STDOUT(
+			    "[MAP] ForceRawPrintingOfNonPrintable(-w): %d\n",
+			    container->ForceRawPrintingOfNonPrintable);
 			break;
 		}
 	}

@@ -28,7 +28,10 @@ struct Flags
 };
 
 struct Flags
-_get_empty_container(char *target_path);
+_get_empty_container();
+
+int
+resolve_path(const char *input_path, char *resolved);
 
 struct Flags
 parse_arguments(int argc, char *argv[]);

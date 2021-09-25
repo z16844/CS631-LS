@@ -8,31 +8,42 @@
 #include "parameters.h"
 
 extern int errno;
-
-struct Flags
-_get_empty_container(char *target_path)
+int
+resolve_path(const char *target_path, char *resolved)
 {
 	char abs_path[PATH_MAX] = {
 		'\x00',
 	};
-	struct Flags NewContainer = {
-		NULL,
-	};
-	if (target_path == NULL)
-		target_path = "./";
-
+	if (target_path == NULL || strlen(target_path) < 1) {
+		TO_STDERR("Invalid target_path: %s\n", target_path);
+		return EXIT_FAILURE;
+	}
 	if (realpath(target_path, abs_path) == NULL) {
 		TO_STDERR("Failed to resolve target path '%s': 0x%x (%s)\n",
 			  target_path, errno, strerror(errno));
-		exit(EXIT_FAILURE);
+		return EXIT_FAILURE;
 	}
-	NewContainer.SpecifiedPath = abs_path;
+
+	resolved = calloc(strlen(abs_path) + 1, sizeof(char));
+	strcpy(resolved, abs_path);
+
+	return EXIT_SUCCESS;
+};
+
+struct Flags
+_get_empty_container()
+{
+	struct Flags NewContainer = {
+		NULL,
+	};
+
+	resolve_path("./", NewContainer.SpecifiedPath);
 	return NewContainer;
 }
 struct Flags
 parse_arguments(int argc, char *argv[])
 {
-	struct Flags Result = _get_empty_container(NULL);
+	struct Flags Result = _get_empty_container();
 	while (argc-- > 1) {
 		TO_STDOUT("Argc: %d => %s\n", argc, argv[argc]);
 	}

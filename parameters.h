@@ -13,7 +13,7 @@ struct _OPTIONS
 	bool NotSortedOutput;				  // -f
 	bool HumanReadableFormat;			  // -h
 	bool ShowInodeNumber;				  // -i
-	bool OverrideSizeFormatAsKb;			  // -k
+	bool SizeFormatAsKb;				  // -k
 	bool ListInLongFormat;				  // -l
 	bool ShowAsUidAndGid;				  // -n
 	bool ForceDisplayingNonPrintableLetters;	  // -q

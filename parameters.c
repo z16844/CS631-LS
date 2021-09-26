@@ -47,6 +47,9 @@ parse_arguments(int argc, char *argv[])
 		switch (argv[argc][0]) {
 		case '-':
 			map_options(Result, argv[argc]);
+
+			/* To make sure dependent options */
+			map_options(Result, argv[argc]);
 			break;
 		default:
 			if (resolve_path(argv[argc], Result) == EXIT_FAILURE) {
@@ -84,8 +87,9 @@ map_options(const POPTIONS container, char *argv)
 			TO_STDOUT("[MAP] IncludeDirectoryEntries(-a): %d\n",
 				  container->IncludeDirectoryEntries);
 			break;
-		case 'c':
-			container->UseLastFileStatusChangeTime = true;
+		case 'c':    // override: -c / -u
+			if (container->SortByLastAccess == false)
+				container->UseLastFileStatusChangeTime = true;
 			TO_STDOUT("[MAP] UseLastFileStatusChangeTime(-c): %d\n",
 				  container->UseLastFileStatusChangeTime);
 			break;
@@ -104,8 +108,11 @@ map_options(const POPTIONS container, char *argv)
 			TO_STDOUT("[MAP] NotSortedOutput(-f): %d\n",
 				  container->NotSortedOutput);
 			break;
-		case 'h':
-			container->HumanReadableFormat = true;
+		case 'h':    // Dependency: -s / -l | override: -k
+			if (container->ListInLongFormat ||
+			    container->OrderBySize)
+				if (container->SizeFormatAsKb == false)
+					container->HumanReadableFormat = true;
 			TO_STDOUT("[MAP] HumanReadableFormat(-h): %d\n",
 				  container->HumanReadableFormat);
 			break;
@@ -114,23 +121,30 @@ map_options(const POPTIONS container, char *argv)
 			TO_STDOUT("[MAP] ShowInodeNumber(-i): %d\n",
 				  container->ShowInodeNumber);
 			break;
-		case 'k':
-			container->OverrideSizeFormatAsKb = true;
-			TO_STDOUT("[MAP] OverrideSizeFormatAsKb(-k): %d\n",
-				  container->OverrideSizeFormatAsKb);
+		case 'k':    // Dependency: -s | override: -h
+			if (container->DisplayByBlockSize &&
+			    container->HumanReadableFormat == false) {
+				container->SizeFormatAsKb = true;
+			}
+			TO_STDOUT("[MAP] SizeFormatAsKb(-k): %d\n",
+				  container->SizeFormatAsKb);
 			break;
-		case 'l':
-			container->ListInLongFormat = true;
+		case 'l':    // override: -l / -n
+			if (container->ShowAsUidAndGid == false)
+				container->ListInLongFormat = true;
 			TO_STDOUT("[MAP] ListInLongFormat(-l): %d\n",
 				  container->ListInLongFormat);
 			break;
-		case 'n':
-			container->ShowAsUidAndGid = true;
+		case 'n':    // override: -l / -n
+			if (container->ListInLongFormat == false)
+				container->ShowAsUidAndGid = true;
 			TO_STDOUT("[MAP] ShowAsUidAndGid(-n): %d\n",
 				  container->ShowAsUidAndGid);
 			break;
-		case 'q':
-			container->ForceDisplayingNonPrintableLetters = true;
+		case 'q':    // override: -q / -w
+			if (container->ForceRawPrintingOfNonPrintable == false)
+				container->ForceDisplayingNonPrintableLetters =
+				    true;
 			TO_STDOUT(
 			    "[MAP] ForceDisplayingNonPrintableLetters(-q): "
 			    "%d\n",
@@ -162,13 +176,17 @@ map_options(const POPTIONS container, char *argv)
 			    "[MAP] OrderByLastModifiedAscending(-t): %d\n",
 			    container->OrderByLastModifiedAscending);
 			break;
-		case 'u':
-			container->SortByLastAccess = true;
+		case 'u':    // override: -c / -u
+			if (container->UseLastFileStatusChangeTime == false)
+				container->SortByLastAccess = true;
 			TO_STDOUT("[MAP] SortByLastAccess(-u): %d\n",
 				  container->SortByLastAccess);
 			break;
-		case 'w':
-			container->ForceRawPrintingOfNonPrintable = true;
+		case 'w':    // override: -q / -w
+			if (container->ForceDisplayingNonPrintableLetters ==
+			    false)
+				container->ForceRawPrintingOfNonPrintable =
+				    true;
 			TO_STDOUT(
 			    "[MAP] ForceRawPrintingOfNonPrintable(-w): %d\n",
 			    container->ForceRawPrintingOfNonPrintable);

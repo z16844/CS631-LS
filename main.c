@@ -81,11 +81,14 @@ main(int argc, char **argv)
 			break;
 		}
 	}
-	printf("optind: %d\n", optind);
-	printf("argc: %d\n", argc);
-	printf("argv: %p\n", argv);
-	printf("argv+optind: %p\n", (argv + optind));
 	argc -= optind;
 	argv += optind;
+	if (argc == 0) {
+		parse_paths(container, "./");
+	} else {
+		while (argc-- > 0) {
+			parse_paths(container, argv[argc]);
+		}
+	}
 	return EXIT_SUCCESS;
 }

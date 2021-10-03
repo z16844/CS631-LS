@@ -24,13 +24,14 @@ typedef struct _OPTIONS
 	bool OrderByLastModifiedAscending;		  // -t
 	bool SortByLastAccess;				  // -u
 	bool ForceRawPrintingOfNonPrintable;		  // -w
-	char *SpecifiedPath;
+	char **Paths;
+	int CountPaths;
 } OPTIONS, *POPTIONS;
 
 POPTIONS
 get_empty_container();
-
 int
 resolve_path(const char *target_path, char *result);
-
+void
+parse_paths(POPTIONS container, char *path);
 #endif /* !_PARAMETERS_H_ */

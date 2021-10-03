@@ -9,7 +9,6 @@
 
 #include "parameters.h"
 
-
 extern int errno;
 extern int optind;
 
@@ -54,15 +53,13 @@ get_empty_container()
 void
 parse_paths(POPTIONS container, char *path)
 {
-	char *resolved = NULL;
 	struct stat stat_path = { 0 };
 	if (stat(path, &stat_path) != EXIT_SUCCESS) {
 		fprintf(stderr, "Invalid Path: %s\n", path);
 		exit(EXIT_FAILURE);
 	}
-
 	container->CountPaths++;
-	container->Paths[container->CountPaths] = resolved;
+	container->Paths[container->CountPaths] = path;
 }
 POPTIONS
 parse_options(int argc, char **argv)

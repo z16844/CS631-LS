@@ -11,5 +11,5 @@ $(TARGET): $(OBJS)
 	mkdir -p ./bin
 	gcc -o ./bin/$@ $(OBJS)
 
-main.o: misc.h parameters.h main.c
+main.o: parameters.h main.c
 parameters.o: parameters.h parameters.c

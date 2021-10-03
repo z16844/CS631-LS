@@ -8,7 +8,7 @@
 int
 main(int argc, char **argv)
 {
-	TO_STDOUT("Hello World!%s\n", "");
+	printf("Hello World!\n");
 	parse_arguments(argc, argv);
 	return EXIT_SUCCESS;
 }

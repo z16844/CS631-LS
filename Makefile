@@ -1,5 +1,5 @@
 CFLAGS=-Wall -Werror -Wextra -std=c99 -g
-OBJS=parameters.o main.o 
+OBJS=main.o 
 TARGET=ls
 
 all: $(TARGET)
@@ -11,5 +11,4 @@ $(TARGET): $(OBJS)
 	mkdir -p ./bin
 	gcc -o ./bin/$@ $(OBJS)
 
-main.o: parameters.h main.c
-parameters.o: parameters.h parameters.c
+main.o: main.c

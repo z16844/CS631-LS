@@ -4,7 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "misc.h"
 #include "parameters.h"
 
 extern int errno;
@@ -30,4 +29,13 @@ resolve_path(const char *target_path, char *result)
 	strcpy(result, abs_path);
 
 	return EXIT_SUCCESS;
+}
+POPTIONS
+get_empty_container()
+{
+	POPTIONS NewContainer = (POPTIONS)calloc(1, sizeof(OPTIONS));
+	bzero(NewContainer, sizeof(OPTIONS));
+
+	resolve_path("./", NewContainer->SpecifiedPath);
+	return NewContainer;
 }

@@ -34,4 +34,6 @@ int
 resolve_path(const char *target_path, char *result);
 void
 parse_paths(POPTIONS container, char *path);
+POPTIONS
+parse_options(int argc, char **argv);
 #endif /* !_PARAMETERS_H_ */

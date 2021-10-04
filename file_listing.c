@@ -12,7 +12,7 @@
 char filetype_symbol[] = "aAbcdlspw-";
 
 PENTRY
-convert(struct dirent *entry, char *location)
+convert(struct dirent *entry, DIR *dir_stream)
 {
 	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
 	bzero(result, sizeof(ENTRY));
@@ -20,15 +20,21 @@ convert(struct dirent *entry, char *location)
 	int read_length = MAX(PATH_MAX, strlen(entry->d_name));
 	strncpy(result->filename, entry->d_name, read_length);
 
-	location = NULL;
-	location = location;
-	// char *file_path =
-	//     strncat(location, result->filename, strlen(result->filename));
-	// struct stat f_stat = { 0 };
-	// if (stat(file_path, &f_stat) != EXIT_SUCCESS) {
-	// 	fprintf(stderr, "Failed to read stat: %s\n", file_path);
-	// 	exit(EXIT_FAILURE);
-	// }
+	int fd_dir = dirfd(dir_stream);
+	if (fd_dir == EXIT_FAILURE) {
+		fprintf(stderr, "Failed to get fd from directory stream\n");
+		exit(EXIT_FAILURE);
+	}
+
+	struct stat f_stat = { 0 };
+	if (fstatat(fd_dir, entry->d_name, &f_stat, 0) == EXIT_FAILURE) {
+		fprintf(stderr,
+			"Failed to get stat from directory stream: %s\n",
+			entry->d_name);
+		exit(EXIT_FAILURE);
+	}
+	result->info = f_stat;
+	closedir(dir_stream);
 
 	switch (entry->d_type) {
 	case DT_BLK:
@@ -60,26 +66,31 @@ convert(struct dirent *entry, char *location)
 
 	return result;
 }
-PENTRY
+PENTRY *
 travel_directory(const POPTIONS options)
 {
-
-	PENTRY query_set = (PENTRY)calloc_checked(1, sizeof(ENTRY));
-	bzero(query_set, sizeof(ENTRY));
+	/* PENTRY[] */
+	PENTRY *query_set =
+	    (PENTRY *)calloc_checked(options->CountPaths + 1, sizeof(PENTRY));
+	bzero(query_set, sizeof(PENTRY));
 
 	DIR *d;
 	struct dirent *dir;
 	int index = options->CountPaths;
 	while (index > -1) {
-		char *path = options->Paths[index--];
+		char *path = options->Paths[index];
 		d = opendir(path);
 		if (d != NULL) {
 			while ((dir = readdir(d)) != NULL) {
-				if (is_visible(options, dir))
-					printf("%s\t", dir->d_name);
+				if (is_visible(options, dir)) {
+					query_set[index] = convert(dir, d);
+					printf("%s\t",
+					       query_set[index]->filename);
+				}
 			}
 			closedir(d);
 		}
+		index--;
 	}
 	return query_set;
 }

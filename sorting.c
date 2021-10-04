@@ -4,18 +4,17 @@ PENTRY
 order_reversal(PENTRY root)
 {
 	PENTRY last = root;
-	PENTRY tmp = NULL;
-
+	PENTRY t = NULL;
 	/* Find last node */
 	while (last->next != NULL)
 		last = last->next;
 	root = last;
 	/* arrange in reversal order */
-	while (last->prev != NULL) {
-		tmp = last->prev;
-		last->prev = last->next;
-		last = last->next = tmp;
-		last = tmp;
+	while (last != NULL) {
+		t = last->next;
+		last->next = last->prev;
+		last->prev = t;
+		last = last->next;
 	}
 	return root;
 }

@@ -13,7 +13,7 @@ main(int argc, char **argv)
 	result = sort(result, options);
 
 	PENTRY cursor = result;
-	while (cursor->next != NULL) {
+	while (cursor != NULL) {
 		printf("%s\t", cursor->filename);
 		cursor = cursor->next;
 	}

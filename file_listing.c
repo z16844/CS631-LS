@@ -70,9 +70,7 @@ PENTRY
 travel_directory(const POPTIONS options)
 {
 	/* PENTRY[] */
-	PENTRY rootNode = (PENTRY)calloc_checked(1, sizeof(ENTRY));
-	PENTRY prev = rootNode, newNode = NULL;
-	bzero(rootNode, sizeof(ENTRY));
+	PENTRY root = NULL, newNode = NULL;
 
 	DIR *d;
 	struct dirent *dir;
@@ -84,16 +82,19 @@ travel_directory(const POPTIONS options)
 			while ((dir = readdir(d)) != NULL) {
 				if (is_visible(options, dir)) {
 					newNode = convert(dir, d);
-					prev->next = newNode;
-					newNode->prev = prev;
-					printf("%s\t", newNode->filename);
+					if (root != NULL)
+						root->next = newNode;
+					newNode->prev = root;
+					root = newNode;
 				}
 			}
 			closedir(d);
 		}
 		index--;
 	}
-	return rootNode;
+	while (root->prev != NULL)
+		root = root->prev;
+	return root;
 }
 bool
 is_visible(const POPTIONS options, struct dirent *entry)

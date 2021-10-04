@@ -3,12 +3,21 @@
 
 #include "file_listing.h"
 #include "parameters.h"
+#include "sorting.h"
 
 int
 main(int argc, char **argv)
 {
 	POPTIONS options = parse_options(argc, argv);
-	travel_directory(options);
+	PENTRY result = travel_directory(options);
+	result = sort(result, options);
+
+	PENTRY cursor = result;
+	while (cursor->next != NULL) {
+		printf("%s\t", cursor->filename);
+		cursor = cursor->next;
+	}
+
 	printf("\n");
 	return EXIT_SUCCESS;
 }

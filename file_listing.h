@@ -29,9 +29,11 @@ typedef struct ENTRY
 	char filename[PATH_MAX];
 	enum filetype type;
 	struct ENTRY **children;    // PENTRY[]
+	struct ENTRY *next;	    // PENTRY
+	struct ENTRY *prev;	    // PENTRY
 } ENTRY, *PENTRY;
 
-PENTRY *
+PENTRY
 travel_directory(const POPTIONS options);
 
 bool

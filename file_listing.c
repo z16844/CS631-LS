@@ -66,13 +66,13 @@ convert(struct dirent *entry, DIR *dir_stream)
 
 	return result;
 }
-PENTRY *
+PENTRY
 travel_directory(const POPTIONS options)
 {
 	/* PENTRY[] */
-	PENTRY *query_set =
-	    (PENTRY *)calloc_checked(options->CountPaths + 1, sizeof(PENTRY));
-	bzero(query_set, sizeof(PENTRY));
+	PENTRY rootNode = (PENTRY)calloc_checked(1, sizeof(ENTRY));
+	PENTRY prev = rootNode, newNode = NULL;
+	bzero(rootNode, sizeof(ENTRY));
 
 	DIR *d;
 	struct dirent *dir;
@@ -83,16 +83,17 @@ travel_directory(const POPTIONS options)
 		if (d != NULL) {
 			while ((dir = readdir(d)) != NULL) {
 				if (is_visible(options, dir)) {
-					query_set[index] = convert(dir, d);
-					printf("%s\t",
-					       query_set[index]->filename);
+					newNode = convert(dir, d);
+					prev->next = newNode;
+					newNode->prev = prev;
+					printf("%s\t", newNode->filename);
 				}
 			}
 			closedir(d);
 		}
 		index--;
 	}
-	return query_set;
+	return rootNode;
 }
 bool
 is_visible(const POPTIONS options, struct dirent *entry)

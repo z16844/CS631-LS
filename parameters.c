@@ -7,6 +7,7 @@
 #include <string.h>
 #include <unistd.h>
 
+#include "misc.h"
 #include "parameters.h"
 
 extern int errno;
@@ -29,7 +30,7 @@ resolve_path(const char *target_path, char *result)
 		return EXIT_FAILURE;
 	}
 
-	result = calloc(strlen(abs_path) + 1, sizeof(char));
+	result = calloc_checked(strlen(abs_path) + 1, sizeof(char));
 	strcpy(result, abs_path);
 
 	return EXIT_SUCCESS;
@@ -37,15 +38,14 @@ resolve_path(const char *target_path, char *result)
 POPTIONS
 get_empty_container()
 {
-	POPTIONS NewContainer = (POPTIONS)calloc(1, sizeof(OPTIONS));
-	bzero(NewContainer, sizeof(OPTIONS));
+	POPTIONS NewContainer = (POPTIONS)calloc_checked(1, sizeof(OPTIONS));
 
 	/*
 	 * According to C Standards, the maximum count of argv is 127. Due to
 	 * option parameters, available argv space would be less than 127,
 	 * however, just set 127 to avoid more complexity for now.
 	 */
-	NewContainer->Paths = (char **)calloc(127, sizeof(char *));
+	NewContainer->Paths = (char **)calloc_checked(127, sizeof(char *));
 	NewContainer->CountPaths = -1;
 
 	return NewContainer;

@@ -6,6 +6,7 @@
 #include <string.h>
 
 #include "file_listing.h"
+#include "misc.h"
 #include "parameters.h"
 
 char filetype_symbol[] = "aAbcdlspw-";
@@ -13,7 +14,7 @@ char filetype_symbol[] = "aAbcdlspw-";
 PENTRY
 convert(struct dirent *entry, char *location)
 {
-	PENTRY result = (PENTRY)calloc(1, sizeof(ENTRY));
+	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
 	bzero(result, sizeof(ENTRY));
 
 	int read_length = MAX(PATH_MAX, strlen(entry->d_name));
@@ -63,7 +64,7 @@ PENTRY
 travel_directory(const POPTIONS options)
 {
 
-	PENTRY query_set = (PENTRY)calloc(1, sizeof(ENTRY));
+	PENTRY query_set = (PENTRY)calloc_checked(1, sizeof(ENTRY));
 	bzero(query_set, sizeof(ENTRY));
 
 	DIR *d;
@@ -85,15 +86,14 @@ travel_directory(const POPTIONS options)
 bool
 is_visible(const POPTIONS options, struct dirent *entry)
 {
-	if (options->ListAllEntries && entry->d_type == DT_DIR) {
+	if (options->IncludeDirectoryEntries) {	   // -a
+		return true;
+	}
+	if (options->ListAllEntries && entry->d_type == DT_DIR) {    // -A
 		if (strcmp(".", entry->d_name) == 0 ||
 		    strcmp("..", entry->d_name) == 0) {
 			return false;
 		}
-	}
-	if (!options->IncludeDirectoryEntries) {
-		if (entry->d_name[0] == '.')
-			return false;
 	}
 	return true;
 }

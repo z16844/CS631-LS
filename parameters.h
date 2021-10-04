@@ -6,7 +6,7 @@
 typedef struct _OPTIONS
 {
 	bool ListAllEntries;				  // -A
-	bool IncludeDirectoryEntries;			  // -a
+	bool AllEntriesIncludeDirectory;		  // -a
 	bool UseLastFileStatusChangeTime;		  // -c
 	bool DirectoriesAsPlainFiles;			  // -d
 	bool WithTypeSymbols;				  // -F

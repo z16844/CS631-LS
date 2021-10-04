@@ -86,14 +86,16 @@ travel_directory(const POPTIONS options)
 bool
 is_visible(const POPTIONS options, struct dirent *entry)
 {
-	if (options->IncludeDirectoryEntries) {	   // -a
+	if (options->AllEntriesIncludeDirectory) {    // -a
 		return true;
 	}
-	if (options->ListAllEntries && entry->d_type == DT_DIR) {    // -A
-		if (strcmp(".", entry->d_name) == 0 ||
-		    strcmp("..", entry->d_name) == 0) {
-			return false;
-		}
+
+	if (!options->ListAllEntries) {	   // -A
+		return entry->d_name[0] != '.';
+	} else if (entry->d_type == DT_DIR) {
+		return !(strcmp(".", entry->d_name) == 0 ||
+			 strcmp("..", entry->d_name) == 0);
 	}
+
 	return true;
 }

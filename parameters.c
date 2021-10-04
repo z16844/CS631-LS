@@ -72,7 +72,7 @@ parse_options(int argc, char **argv)
 			container->ListAllEntries = true;
 			break;
 		case 'a':
-			container->IncludeDirectoryEntries = true;
+			container->AllEntriesIncludeDirectory = true;
 			break;
 		case 'u':    // override: -c / -u
 			container->UseLastFileStatusChangeTime = false;

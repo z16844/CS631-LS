@@ -1,3 +1,5 @@
+#include "file_listing.h"
+
 #include <sys/param.h>
 
 #include <dirent.h>
@@ -5,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "file_listing.h"
 #include "misc.h"
 #include "parameters.h"
 

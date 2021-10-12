@@ -1,3 +1,5 @@
+#include "parameters.h"
+
 #include <sys/stat.h>
 
 #include <errno.h>
@@ -8,7 +10,6 @@
 #include <unistd.h>
 
 #include "misc.h"
-#include "parameters.h"
 
 extern int errno;
 extern int optind;

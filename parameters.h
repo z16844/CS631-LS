@@ -5,8 +5,8 @@
 
 typedef struct _OPTIONS
 {
-	bool ListAllEntries;				  // -A
-	bool AllEntriesIncludeDirectory;		  // -a
+	bool ListAllEntries;				  // -A***
+	bool AllEntriesIncludeDirectory;		  // -a***
 	bool OrderByLastChanged;			  // -c***
 	bool DirectoriesAsPlainFiles;			  // -d
 	bool WithTypeSymbols;				  // -F

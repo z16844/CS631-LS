@@ -41,7 +41,28 @@ swap_node(PENTRY *current)
 		tmp->next->prev = tmp;
 }
 int
-comparer_filename(const PENTRY a, const PENTRY b)
+comparer_ctime(const PENTRY a, const PENTRY b)
+{
+	return (a->info.st_ctime) - (b->info.st_ctime);
+}
+int
+comparer_atime(const PENTRY a, const PENTRY b)
+{
+	return (a->info.st_atime) - (b->info.st_atime);
+}
+int
+comparer_mtime(const PENTRY a, const PENTRY b)
+{
+	return (a->info.st_mtime) - (b->info.st_mtime);
+}
+int
+comparer_file_size(const PENTRY a, const PENTRY b)
+{
+	/* -S is to order descending by file size*/
+	return (b->info.st_size) - (a->info.st_size);
+}
+int
+comparer_lexicographical(const PENTRY a, const PENTRY b)
 {
 	return strcmp(a->filename, b->filename);
 }
@@ -63,12 +84,22 @@ order_by_comparer(PENTRY *rootPtr, int comparer(const PENTRY, const PENTRY))
 PENTRY
 sort(PENTRY root, const POPTIONS options)
 {
-	if (options->OrderByLastModifiedAscending) {
+	if (options->NotSortedOutput) {	   // -f
+		return root;
 	} else {
-		order_by_comparer(&root, comparer_filename);
+		order_by_comparer(&root, comparer_lexicographical);
 	}
-	// order_lexicographical(root);
-	if (options->ReverseTheLexicographicalOrder)
+
+	if (options->OrderByLastModifiedAscending) {	// -t
+		order_by_comparer(&root, comparer_mtime);
+	} else if (options->UseLastFileStatusChangeTime) {    // -c
+		order_by_comparer(&root, comparer_ctime);
+	} else if (options->SortByLastAccess) {	   // -u
+		order_by_comparer(&root, comparer_atime);
+	} else if (options->OrderBySize) {    // -S
+		order_by_comparer(&root, comparer_file_size);
+	}
+	if (options->ReverseTheLexicographicalOrder)	// -r
 		return order_reversal(root);
 	return root;
 }

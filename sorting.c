@@ -90,16 +90,16 @@ sort(PENTRY root, const POPTIONS options)
 		order_by_comparer(&root, comparer_lexicographical);
 	}
 
-	if (options->OrderByLastModifiedAscending) {	// -t
+	if (options->OrderByLastModified) {    // -t
 		order_by_comparer(&root, comparer_mtime);
-	} else if (options->UseLastFileStatusChangeTime) {    // -c
+	} else if (options->OrderByLastChanged) {    // -c
 		order_by_comparer(&root, comparer_ctime);
-	} else if (options->SortByLastAccess) {	   // -u
+	} else if (options->OrderByLastAccess) {    // -u
 		order_by_comparer(&root, comparer_atime);
-	} else if (options->OrderBySize) {    // -S
+	} else if (options->OrderDesceningBySize) {    // -S
 		order_by_comparer(&root, comparer_file_size);
 	}
-	if (options->ReverseTheLexicographicalOrder)	// -r
+	if (options->OrderReversal)    // -r
 		return order_reversal(root);
 	return root;
 }

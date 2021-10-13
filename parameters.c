@@ -76,12 +76,12 @@ parse_options(int argc, char **argv)
 			container->AllEntriesIncludeDirectory = true;
 			break;
 		case 'u':    // override: -c / -u
-			container->UseLastFileStatusChangeTime = false;
-			container->SortByLastAccess = true;
+			container->OrderByLastChanged = false;
+			container->OrderByLastAccess = true;
 			break;
 		case 'c':    // override: -c / -u
-			container->SortByLastAccess = false;
-			container->UseLastFileStatusChangeTime = true;
+			container->OrderByLastAccess = false;
+			container->OrderByLastChanged = true;
 			break;
 		case 'd':
 			container->DirectoriesAsPlainFiles = true;
@@ -116,16 +116,16 @@ parse_options(int argc, char **argv)
 			    true;
 			break;
 		case 'r':
-			container->ReverseTheLexicographicalOrder = true;
+			container->OrderReversal = true;
 			break;
 		case 'S':
-			container->OrderBySize = true;
+			container->OrderDesceningBySize = true;
 			break;
 		case 's':
 			container->DisplayByBlockSize = true;
 			break;
 		case 't':
-			container->OrderByLastModifiedAscending = true;
+			container->OrderByLastModified = true;
 			break;
 		case 'q':    // override: -q / -w
 			container->ForceRawPrintingOfNonPrintable = false;

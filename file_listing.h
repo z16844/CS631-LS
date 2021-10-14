@@ -11,16 +11,16 @@
 
 enum filetype
 {
-	Archive_state_1,	   // a
-	Archive_state_2,	   // A
-	Block_special_file,	   // b
-	Character_special_file,	   // c
 	Directory,		   // d
 	Symbolic_link,		   // l
 	Socket_link,		   // s
 	FIFO,			   // p
 	Whiteout,		   // w
 	Regular_file,		   // −
+	Archive_state_1,	   // a
+	Archive_state_2,	   // A
+	Block_special_file,	   // b
+	Character_special_file,	   // c
 };
 
 typedef struct ENTRY

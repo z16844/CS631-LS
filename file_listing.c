@@ -12,32 +12,11 @@
 
 char filetype_symbol[] = "aAbcdlspw-";
 
-PENTRY
-convert(struct dirent *entry, DIR *dir_stream)
+extern int errno;
+void
+parse_type(PENTRY result, const mode_t st_mode)
 {
-	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
-	bzero(result, sizeof(ENTRY));
-
-	int read_length = MAX(PATH_MAX, strlen(entry->d_name));
-	strncpy(result->filename, entry->d_name, read_length);
-
-	int fd_dir = dirfd(dir_stream);
-	if (fd_dir == EXIT_FAILURE) {
-		fprintf(stderr, "Failed to get fd from directory stream\n");
-		exit(EXIT_FAILURE);
-	}
-
-	struct stat f_stat = { 0 };
-	if (fstatat(fd_dir, entry->d_name, &f_stat, 0) == EXIT_FAILURE) {
-		fprintf(stderr,
-			"Failed to get stat from directory stream: %s\n",
-			entry->d_name);
-		exit(EXIT_FAILURE);
-	}
-	result->info = f_stat;
-	closedir(dir_stream);
-
-	switch (entry->d_type) {
+	switch (st_mode) {
 	case DT_BLK:
 		result->type = Block_special_file;
 		break;
@@ -64,6 +43,51 @@ convert(struct dirent *entry, DIR *dir_stream)
 		result->type = Regular_file;
 		break;
 	}
+}
+PENTRY
+convert_file(const char *path)
+{
+	struct stat f_stat = { 0 };
+	if (stat(path, &f_stat) != EXIT_SUCCESS) {
+		fprintf(
+		    stderr,
+		    "Failed to get stat from directory stream: %s - 0x%x(%s)\n",
+		    path, errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
+	strncpy(result->filename, path, strlen(path));
+	result->info = f_stat;
+	parse_type(result, f_stat.st_mode);
+	return result;
+}
+
+PENTRY
+convert_directory(struct dirent *entry, DIR *dir_stream)
+{
+	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
+	bzero(result, sizeof(ENTRY));
+
+	int read_length = MAX(PATH_MAX, strlen(entry->d_name));
+	strncpy(result->filename, entry->d_name, read_length);
+
+	int fd_dir = dirfd(dir_stream);
+	if (fd_dir == EXIT_FAILURE) {
+		fprintf(stderr, "Failed to get fd from directory stream\n");
+		exit(EXIT_FAILURE);
+	}
+
+	struct stat f_stat = { 0 };
+	if (fstatat(fd_dir, entry->d_name, &f_stat, 0) == EXIT_FAILURE) {
+		fprintf(
+		    stderr,
+		    "Failed to get stat from directory stream: %s - 0x%x(%s)\n",
+		    entry->d_name, errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	}
+	result->info = f_stat;
+	closedir(dir_stream);
+	parse_type(result, entry->d_type);
 
 	return result;
 }
@@ -82,15 +106,16 @@ travel_directory(const POPTIONS options)
 		if (d != NULL) {
 			while ((dir = readdir(d)) != NULL) {
 				if (is_visible(options, dir)) {
-					newNode = convert(dir, d);
+					newNode = convert_directory(dir, d);
 					if (root != NULL)
 						root->next = newNode;
 					newNode->prev = root;
 					root = newNode;
 				}
+				closedir(d);
 			}
-			closedir(d);
-		}
+		} else
+			query_set[index] = convert_file(path);
 		index--;
 	}
 	while (root->prev != NULL)

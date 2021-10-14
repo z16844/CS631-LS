@@ -31,7 +31,7 @@ add_indicators(PENTRY root)
 				    &(filetype_symbols[cursor->type]), 1);
 			break;
 		default:
-			if ((cursor->info->st_mode & S_IEXEC)) {
+			if ((cursor->info.st_mode & S_IEXEC)) {
 				new_name = strncat(cursor->filename, "*", 1);
 			}
 			break;

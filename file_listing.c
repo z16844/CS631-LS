@@ -94,7 +94,6 @@ convert_directory(struct dirent *entry, DIR *dir_stream)
 PENTRY
 travel_directory(const POPTIONS options)
 {
-	/* PENTRY[] */
 	PENTRY root = NULL, newNode = NULL;
 
 	DIR *d;
@@ -114,8 +113,13 @@ travel_directory(const POPTIONS options)
 				}
 				closedir(d);
 			}
-		} else
-			query_set[index] = convert_file(path);
+		} else {
+			newNode = convert_file(path);
+			if (root != NULL)
+				root->next = newNode;
+			newNode->prev = root;
+			root = newNode;
+		}
 		index--;
 	}
 	while (root->prev != NULL)

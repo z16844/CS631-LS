@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "display.h"
 #include "file_listing.h"
 #include "parameters.h"
 #include "sorting.h"
@@ -12,12 +13,7 @@ main(int argc, char **argv)
 	PENTRY result = travel_directory(options);
 	result = sort(result, options);
 
-	PENTRY cursor = result;
-	while (cursor != NULL) {
-		printf("%s\t", cursor->filename);
-		cursor = cursor->next;
-	}
+	print_entries(result, options);
 
-	printf("\n");
 	return EXIT_SUCCESS;
 }

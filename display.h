@@ -4,10 +4,19 @@
 
 #ifndef _DISPLAY_H_
 #define _DISPLAY_H_
-/*
- * the sequences of indicators are based on "enum filetype"
- * in file_listing.h
- */
+
+typedef struct display_format_setting
+{
+	int numberOfEntries;
+	int totalLines;
+	int ColumnsOfTerminal;
+	// from file
+	unsigned int maxHardLinks;
+	unsigned int maxUserLen;
+	unsigned int maxGroupLen;
+	unsigned int maxSizeLen;
+	int maxFilenameLen;
+} FORM_SETTING;
 
 void
 print_entries(PENTRY root, const POPTIONS options);

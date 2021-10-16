@@ -34,3 +34,24 @@ calloc_checked(int count, size_t type_size)
 	bzero(allocated, count * type_size);
 	return allocated;
 }
+char *
+itoa(int value)
+{
+	int len = (value / 10) + 1;    // without NULL-terminator
+	char *buf = (char *)calloc_checked(len + 1, sizeof(char));
+	if (sprintf(buf, "%d", value) == -1) {
+		fprintf(stderr, "Invalid Parameter to itoa()");
+		exit(EXIT_FAILURE);
+	}
+	return buf;
+}
+char *
+parse_timestamp(time_t *time)
+{
+	char *result = (char *)calloc_checked(13, sizeof(char));
+	struct tm *t;
+	t = localtime(time);
+
+	strftime(result, 13, "%b %e %R", t);
+	return result;
+}

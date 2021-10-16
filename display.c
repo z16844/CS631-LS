@@ -10,6 +10,8 @@
 #include <strings.h>
 #include <unistd.h>
 
+extern int errno;
+
 char *
 itoa(int value)
 {
@@ -25,21 +27,36 @@ char *
 getGroupName(gid_t gid)
 {
 	struct group *g = getgrgid(gid);
-	if (g == NULL) {
-		fprintf(stderr, "Failed to get group name from gid: %d\n", gid);
+	if (g != NULL) {
+		return g->gr_name;
+	}
+	if (errno != 0) {
+		fprintf(stderr,
+			"Failed to get group name from gid: %d - 0x%x(%s)\n",
+			gid, errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	} else {
+		fprintf(stderr, "Failed to find group name from gid: %d\n",
+			gid);
 		exit(EXIT_FAILURE);
 	}
-	return g->gr_name;
 }
 char *
 getUserName(uid_t uid)
 {
-	struct passwd *pw = getpwuid(uid);
-	if (pw == NULL) {
-		fprintf(stderr, "Failed to get user name from uid: %d\n", uid);
+	struct passwd *pw = NULL;
+	if ((pw = getpwuid(uid)) != NULL) {
+		return pw->pw_name;
+	}
+	if (errno != 0) {
+		fprintf(stderr,
+			"Failed to get user name from uid: %d - 0x%x(%s)\n",
+			uid, errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	} else {
+		fprintf(stderr, "Failed to find user name from uid: %d\n", uid);
 		exit(EXIT_FAILURE);
 	}
-	return pw->pw_name;
 }
 /*
  * the sequences of indicators are based on "enum filetype"
@@ -175,12 +192,12 @@ initialize_setting(PENTRY root)
 			setting->maxFilenameLen = name_len;
 
 		/* TODO: -n options (options->ShowAsUidAndGid) */
-		char *user_name = getUserName(cursor->info.st_uid);
-		if (strlen(user_name) > setting->maxUserLen)
-			setting->maxUserLen = strlen(user_name);
-		char *group_name = getGroupName(cursor->info.st_gid);
-		if (strlen(group_name) > setting->maxUserLen)
-			setting->maxGroupLen = strlen(group_name);
+		// char *user_name = getUserName(cursor->info.st_uid);
+		// if (strlen(user_name) > setting->maxUserLen)
+		// 	setting->maxUserLen = strlen(user_name);
+		// char *group_name = getGroupName(cursor->info.st_gid);
+		// if (strlen(group_name) > setting->maxUserLen)
+		// 	setting->maxGroupLen = strlen(group_name);
 
 		/* TODO: -h options (options->HumanReadableFormat) */
 		if (strlen(itoa(cursor->info.st_size)) > setting->maxSizeLen)
@@ -189,6 +206,7 @@ initialize_setting(PENTRY root)
 		/* Check the number of max hard links */
 		if (strlen(itoa(cursor->info.st_nlink)) > setting->maxHardLinks)
 			setting->maxHardLinks = cursor->info.st_nlink;
+		cursor = cursor->next;
 	}
 }
 void

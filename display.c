@@ -127,14 +127,17 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	strncpy(&(line_buf[offset]), size, strlen(size));
 	free(size);
 
-	/* TODO: build DateTime*/
 	char *timestamp = parse_timestamp(&entry->info.st_mtime);
 	offset += strlen(size) + 1;
 	strncpy(&(line_buf[offset]), timestamp, strlen(timestamp));
+	free(timestamp);
 
 	offset += strlen(timestamp) + 1;
 	int lenFilename = strlen(entry->filename);
-	strncat(&(line_buf[offset]), entry->filename, lenFilename);
+	strncpy(&(line_buf[offset]), entry->filename, lenFilename);
+	offset += lenFilename;
+	line_buf[offset] = '\x00';
+
 	printf(line_buf);
 	printf("\n");
 }

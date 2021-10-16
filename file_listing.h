@@ -26,7 +26,7 @@ enum filetype
 typedef struct ENTRY
 {
 	struct stat info;
-	char filename[PATH_MAX];
+	char *filename;
 	enum filetype type;
 	struct ENTRY **children;    // PENTRY[]
 	struct ENTRY *next;	    // PENTRY

@@ -59,6 +59,8 @@ convert_file(const char *path, int fd_dir)
 	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
 
 	int read_length = MAX(PATH_MAX, strlen(path));
+	result->filename =
+	    (char *)calloc_checked(read_length + 1, sizeof(char));
 	strncpy(result->filename, path, read_length);
 
 	memcpy(&result->info, &f_stat, sizeof(f_stat));

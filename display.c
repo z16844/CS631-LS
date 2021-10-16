@@ -8,21 +8,13 @@
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
+#include <time.h>
 #include <unistd.h>
+
+#include "misc.h"
 
 extern int errno;
 
-char *
-itoa(int value)
-{
-	int len = (value / 10) + 1;    // without NULL-terminator
-	char *buf = (char *)calloc_checked(len + 1, sizeof(char));
-	if (sprintf(buf, "%d", value) == -1) {
-		fprintf(stderr, "Invalid Parameter to itoa()");
-		exit(EXIT_FAILURE);
-	}
-	return buf;
-}
 char *
 getGroupName(gid_t gid)
 {
@@ -136,7 +128,11 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	free(size);
 
 	/* TODO: build DateTime*/
-	offset += strlen(size) + 1 + len_DateTime + 1;
+	char *timestamp = parse_timestamp(&entry->info.st_mtime);
+	offset += strlen(size) + 1;
+	strncpy(&(line_buf[offset]), timestamp, strlen(timestamp));
+
+	offset += strlen(timestamp) + 1;
 	int lenFilename = strlen(entry->filename);
 	strncat(&(line_buf[offset]), entry->filename, lenFilename);
 	printf(line_buf);

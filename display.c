@@ -64,7 +64,6 @@ print_long_format(PENTRY entry, const POPTIONS options)
 			break;
 		}
 	}
-	/* TODO: handle blanks */
 	offset = 10;
 	line_buf[offset] = '\x20';
 
@@ -73,12 +72,16 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	strncpy(&(line_buf[offset]), hardlinks, setting->maxHardLinks);
 	free(hardlinks);
 
-	char *username = getUserName(entry->info.st_uid);
+	char *username = options->ShowAsUidAndGid
+			     ? itoa(entry->info.st_uid)
+			     : getUserName(entry->info.st_uid);
 	offset +=
 	    strlen(hardlinks) + 1 + setting->maxUserLen - strlen(username);
 	strncpy(&(line_buf[offset]), username, strlen(username));
 
-	char *group_name = getGroupName(entry->info.st_gid);
+	char *group_name = options->ShowAsUidAndGid
+			       ? itoa(entry->info.st_gid)
+			       : getGroupName(entry->info.st_gid);
 	offset +=
 	    strlen(username) + 1 + setting->maxGroupLen - strlen(group_name);
 	strncpy(&(line_buf[offset]), group_name, strlen(group_name));

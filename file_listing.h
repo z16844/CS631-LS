@@ -53,7 +53,7 @@ bool
 is_visible(const POPTIONS options, struct dirent *entry);
 
 void
-update_metadata(PENTRY entry);
+update_metadata(PENTRY entry, const POPTIONS options);
 
 FORM_SETTING *
 get_metadata();

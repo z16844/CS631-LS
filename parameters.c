@@ -108,7 +108,7 @@ parse_options(int argc, char **argv)
 			container->ListInLongFormat = true;
 			break;
 		case 'n':    // override: -l / -n
-			container->ListInLongFormat = false;
+			container->ListInLongFormat = true;
 			container->ShowAsUidAndGid = true;
 			break;
 		case 'R':

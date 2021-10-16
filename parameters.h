@@ -15,7 +15,7 @@ typedef struct _OPTIONS
 	bool ShowInodeNumber;				  // -i
 	bool SizeFormatAsKb;				  // -k
 	bool ListInLongFormat;				  // -l***
-	bool ShowAsUidAndGid;				  // -n
+	bool ShowAsUidAndGid;				  // -n***
 	bool ForceDisplayingNonPrintableLetters;	  // -q
 	bool ListRecursivelySubDirectoriesEncountered;	  // -R
 	bool OrderReversal;				  // -r***

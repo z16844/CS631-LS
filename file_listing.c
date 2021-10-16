@@ -49,7 +49,7 @@ parse_type(PENTRY result, const mode_t st_mode)
 	}
 }
 PENTRY
-convert_file(const char *path, int fd_dir)
+convert_file(const char *path, int fd_dir, const POPTIONS options)
 {
 	struct stat f_stat = { 0 };
 
@@ -69,12 +69,12 @@ convert_file(const char *path, int fd_dir)
 
 	memcpy(&result->info, &f_stat, sizeof(f_stat));
 	parse_type(result, f_stat.st_mode);
-	update_metadata(result);
+	update_metadata(result, options);
 	return result;
 }
 
 PENTRY
-convert_directory(struct dirent *entry, DIR *dir_stream)
+convert_directory(struct dirent *entry, DIR *dir_stream, const POPTIONS options)
 {
 	int fd_dir = dirfd(dir_stream);
 	if (fd_dir == EXIT_FAILURE) {
@@ -82,7 +82,7 @@ convert_directory(struct dirent *entry, DIR *dir_stream)
 		exit(EXIT_FAILURE);
 	}
 
-	PENTRY result = convert_file(entry->d_name, fd_dir);
+	PENTRY result = convert_file(entry->d_name, fd_dir, options);
 	parse_type(result, entry->d_type);
 
 	return result;
@@ -101,7 +101,8 @@ travel_directory(const POPTIONS options)
 		if (d != NULL) {
 			while ((dir = readdir(d)) != NULL) {
 				if (is_visible(options, dir)) {
-					newNode = convert_directory(dir, d);
+					newNode =
+					    convert_directory(dir, d, options);
 					if (root != NULL)
 						root->next = newNode;
 					newNode->prev = root;
@@ -110,7 +111,7 @@ travel_directory(const POPTIONS options)
 			}
 			closedir(d);
 		} else {
-			newNode = convert_file(path, 0);
+			newNode = convert_file(path, 0, options);
 			if (root != NULL)
 				root->next = newNode;
 			newNode->prev = root;
@@ -140,7 +141,7 @@ is_visible(const POPTIONS options, struct dirent *entry)
 }
 
 void
-update_metadata(PENTRY entry)
+update_metadata(PENTRY entry, const POPTIONS options)
 {
 	if (settings == NULL)
 		settings =
@@ -163,20 +164,19 @@ update_metadata(PENTRY entry)
 		settings->maxHardLinks = len_hardlinks;
 	free(hardlinks);
 
-	/* TODO: -n options (options->ShowAsUidAndGid) */
-	char *username = getUserName(entry->info.st_uid);
+	char *username = options->ShowAsUidAndGid
+			     ? itoa(entry->info.st_uid)
+			     : getUserName(entry->info.st_uid);
 	size_t len_username = strlen(username);
 	if (len_username > settings->maxUserLen)
 		settings->maxUserLen = len_username;
-	// /* TESTING CODE TO BYPASS SIGSEGV */
-	// settings->maxUserLen = 8;
 
-	char *group_name = getGroupName(entry->info.st_gid);
+	char *group_name = options->ShowAsUidAndGid
+			       ? itoa(entry->info.st_gid)
+			       : getGroupName(entry->info.st_gid);
 	size_t len_group_name = strlen(group_name);
 	if (len_group_name > settings->maxGroupLen)
 		settings->maxGroupLen = len_group_name;
-	// /* TESTING CODE TO BYPASS SIGSEGV */
-	// settings->maxGroupLen = 5;
 
 	settings->numberOfEntries++;
 }

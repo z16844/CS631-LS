@@ -53,7 +53,7 @@ getUserName(uid_t uid)
  */
 char *filetype_indicator = "dlspw-aAbc";
 char *filetype_symbols = "/@=|%%\0\0\0\0\0";
-FORM_SETTING *setting = NULL;
+static FORM_SETTING *setting = NULL;
 void
 print_long_format(PENTRY entry, const POPTIONS options)
 {
@@ -165,7 +165,7 @@ add_indicators(PENTRY root)
 			}
 			break;
 		}
-		if (strlen(new_name) > 0)
+		if (new_name != NULL && strlen(new_name) > 0)
 			strncpy(cursor->filename, new_name, strlen(new_name));
 		// free(new_name);
 		cursor = cursor->next;

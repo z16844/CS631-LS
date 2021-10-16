@@ -1,9 +1,12 @@
 #include "misc.h"
 
 #include <errno.h>
+#include <grp.h>
+#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
 
 extern int errno;
 
@@ -54,4 +57,37 @@ parse_timestamp(time_t *time)
 
 	strftime(result, 13, "%b %e %R", t);
 	return result;
+}
+
+char *
+getGroupName(gid_t gid)
+{
+	struct group *g = NULL;
+	if ((g = getgrgid(gid)) != NULL) {
+		return g->gr_name;
+	}
+	if (errno != 0) {
+		fprintf(stderr,
+			"Failed to get group name from gid: %d - 0x%x(%s)\n",
+			gid, errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	} else {
+		return itoa(gid);
+	}
+}
+char *
+getUserName(uid_t uid)
+{
+	struct passwd *pw = NULL;
+	if ((pw = getpwuid(uid)) != NULL) {
+		return pw->pw_name;
+	}
+	if (errno != 0) {
+		fprintf(stderr,
+			"Failed to get user name from uid: %d - 0x%x(%s)\n",
+			uid, errno, strerror(errno));
+		exit(EXIT_FAILURE);
+	} else {
+		return itoa(uid);
+	}
 }

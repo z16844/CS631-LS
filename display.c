@@ -1,59 +1,23 @@
 #include "display.h"
 
-#include <sys/ioctl.h>
-
-#include <grp.h>
-#include <pwd.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <strings.h>
 #include <time.h>
-#include <unistd.h>
 
 #include "misc.h"
 
 extern int errno;
+FORM_SETTING *setting = NULL;
 
-char *
-getGroupName(gid_t gid)
-{
-	struct group *g = NULL;
-	if ((g = getgrgid(gid)) != NULL) {
-		return g->gr_name;
-	}
-	if (errno != 0) {
-		fprintf(stderr,
-			"Failed to get group name from gid: %d - 0x%x(%s)\n",
-			gid, errno, strerror(errno));
-		exit(EXIT_FAILURE);
-	} else {
-		return itoa(gid);
-	}
-}
-char *
-getUserName(uid_t uid)
-{
-	struct passwd *pw = NULL;
-	if ((pw = getpwuid(uid)) != NULL) {
-		return pw->pw_name;
-	}
-	if (errno != 0) {
-		fprintf(stderr,
-			"Failed to get user name from uid: %d - 0x%x(%s)\n",
-			uid, errno, strerror(errno));
-		exit(EXIT_FAILURE);
-	} else {
-		return itoa(uid);
-	}
-}
 /*
  * the sequences of indicators are based on "enum filetype"
  * in file_listing.h
  */
 char *filetype_indicator = "dlspw-aAbc";
 char *filetype_symbols = "/@=|%%\0\0\0\0\0";
-static FORM_SETTING *setting = NULL;
+
 void
 print_long_format(PENTRY entry, const POPTIONS options)
 {
@@ -171,57 +135,11 @@ add_indicators(PENTRY root)
 		cursor = cursor->next;
 	}
 }
-void
-initialize_setting(PENTRY root)
-{
-	PENTRY cursor = root;
-	struct winsize w;
-	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
 
-	/* Check the width of terminal */
-	if (setting == NULL)
-		setting =
-		    (FORM_SETTING *)calloc_checked(1, sizeof(FORM_SETTING));
-	setting->ColumnsOfTerminal = w.ws_col;
-	setting->numberOfEntries = 0;
-
-	while (cursor != NULL) {
-		/* Check the maximum length of file name */
-		int name_len = strlen(cursor->filename);
-		if (name_len > setting->maxFilenameLen)
-			setting->maxFilenameLen = name_len;
-
-		/* TODO: -n options (options->ShowAsUidAndGid) */
-		char *username = getUserName(cursor->info.st_uid);
-		if (strlen(username) > setting->maxUserLen)
-			setting->maxUserLen = strlen(username);
-		// /* TESTING CODE TO BYPASS SIGSEGV */
-		// setting->maxUserLen = 8;
-
-		char *group_name = getGroupName(cursor->info.st_gid);
-		if (strlen(group_name) > setting->maxGroupLen)
-			setting->maxGroupLen = strlen(group_name);
-		// /* TESTING CODE TO BYPASS SIGSEGV */
-		// setting->maxGroupLen = 5;
-
-		/* TODO: -h options (options->HumanReadableFormat) */
-		char *size = itoa(cursor->info.st_size);
-		if (strlen(size) > setting->maxSizeLen)
-			setting->maxSizeLen = strlen(size);
-		free(size);
-		/* Check the number of max hard links */
-		char *hardlinks = itoa(cursor->info.st_nlink);
-		if (strlen(hardlinks) > setting->maxHardLinks)
-			setting->maxHardLinks = strlen(hardlinks);
-		free(hardlinks);
-		setting->numberOfEntries++;
-		cursor = cursor->next;
-	}
-}
 void
 print_entries(PENTRY root, const POPTIONS options)
 {
-	// initialize_setting(root);
+	setting = get_metadata();
 	if (options->WithTypeSymbols) {	   // -F
 		add_indicators(root);
 	}

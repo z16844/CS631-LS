@@ -1,18 +1,22 @@
 #include "file_listing.h"
 
 #include <sys/param.h>
+#include <sys/ioctl.h>
 
 #include <dirent.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <unistd.h>
 
 #include "misc.h"
 #include "parameters.h"
 
-char filetype_symbol[] = "aAbcdlspw-";
-
 extern int errno;
+
+char filetype_symbol[] = "aAbcdlspw-";
+FORM_SETTING *settings = NULL;
+
 void
 parse_type(PENTRY result, const mode_t st_mode)
 {
@@ -65,6 +69,7 @@ convert_file(const char *path, int fd_dir)
 
 	memcpy(&result->info, &f_stat, sizeof(f_stat));
 	parse_type(result, f_stat.st_mode);
+	update_metadata(result);
 	return result;
 }
 
@@ -78,7 +83,6 @@ convert_directory(struct dirent *entry, DIR *dir_stream)
 	}
 
 	PENTRY result = convert_file(entry->d_name, fd_dir);
-	closedir(dir_stream);
 	parse_type(result, entry->d_type);
 
 	return result;
@@ -86,8 +90,8 @@ convert_directory(struct dirent *entry, DIR *dir_stream)
 PENTRY
 travel_directory(const POPTIONS options)
 {
-	PENTRY root = NULL, newNode = NULL;
 
+	PENTRY root = NULL, newNode = NULL;
 	DIR *d;
 	struct dirent *dir;
 	int index = options->CountPaths;
@@ -103,8 +107,8 @@ travel_directory(const POPTIONS options)
 					newNode->prev = root;
 					root = newNode;
 				}
-				closedir(d);
 			}
+			closedir(d);
 		} else {
 			newNode = convert_file(path, 0);
 			if (root != NULL)
@@ -133,4 +137,55 @@ is_visible(const POPTIONS options, struct dirent *entry)
 	}
 
 	return true;
+}
+
+void
+update_metadata(PENTRY entry)
+{
+	if (settings == NULL)
+		settings =
+		    (FORM_SETTING *)calloc_checked(1, sizeof(FORM_SETTING));
+
+	int name_len = strlen(entry->filename);
+	if (name_len > settings->maxFilenameLen)
+		settings->maxFilenameLen = name_len;
+
+	/* TODO: -h options (options->HumanReadableFormat) */
+	char *size = itoa(entry->info.st_size);
+	size_t len_size = strlen(size);
+	if (len_size > settings->maxSizeLen)
+		settings->maxSizeLen = len_size;
+	free(size);
+
+	char *hardlinks = itoa(entry->info.st_nlink);
+	size_t len_hardlinks = strlen(hardlinks);
+	if (len_hardlinks > settings->maxHardLinks)
+		settings->maxHardLinks = len_hardlinks;
+	free(hardlinks);
+
+	/* TODO: -n options (options->ShowAsUidAndGid) */
+	char *username = getUserName(entry->info.st_uid);
+	size_t len_username = strlen(username);
+	if (len_username > settings->maxUserLen)
+		settings->maxUserLen = len_username;
+	// /* TESTING CODE TO BYPASS SIGSEGV */
+	// settings->maxUserLen = 8;
+
+	char *group_name = getGroupName(entry->info.st_gid);
+	size_t len_group_name = strlen(group_name);
+	if (len_group_name > settings->maxGroupLen)
+		settings->maxGroupLen = len_group_name;
+	// /* TESTING CODE TO BYPASS SIGSEGV */
+	// settings->maxGroupLen = 5;
+
+	settings->numberOfEntries++;
+}
+FORM_SETTING *
+get_metadata()
+{
+	struct winsize w;
+	ioctl(STDOUT_FILENO, TIOCGWINSZ, &w);
+	settings->ColumnsOfTerminal = w.ws_col;
+
+	return settings;
 }

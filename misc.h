@@ -13,4 +13,10 @@ itoa(int value);
 char *
 parse_timestamp(time_t *tm);
 
+char *
+getUserName(uid_t uid);
+
+char *
+getGroupName(gid_t gid);
+
 #endif /* !_MISC_H_ */

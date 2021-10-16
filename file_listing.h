@@ -33,10 +33,29 @@ typedef struct ENTRY
 	struct ENTRY *prev;	    // PENTRY
 } ENTRY, *PENTRY;
 
+typedef struct metadata
+{
+	int numberOfEntries;
+	int totalLines;
+	int ColumnsOfTerminal;
+	// from file
+	unsigned int maxHardLinks;
+	unsigned int maxUserLen;
+	unsigned int maxGroupLen;
+	unsigned int maxSizeLen;
+	int maxFilenameLen;
+} FORM_SETTING;
+
 PENTRY
 travel_directory(const POPTIONS options);
 
 bool
 is_visible(const POPTIONS options, struct dirent *entry);
+
+void
+update_metadata(PENTRY entry);
+
+FORM_SETTING *
+get_metadata();
 
 #endif /* !_LISTING_H_ */

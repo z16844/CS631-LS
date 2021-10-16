@@ -45,20 +45,22 @@ parse_type(PENTRY result, const mode_t st_mode)
 	}
 }
 PENTRY
-convert_file(const char *path)
+convert_file(const char *path, int fd_dir)
 {
 	struct stat f_stat = { 0 };
-	if (stat(path, &f_stat) != EXIT_SUCCESS) {
-		fprintf(
-		    stderr,
-		    "Failed to get stat from directory stream: %s - 0x%x(%s)\n",
-		    path, errno, strerror(errno));
+
+	int ret = fd_dir > 0 ? fstatat(fd_dir, path, &f_stat, 0)
+			     : stat(path, &f_stat);
+	if (ret != EXIT_SUCCESS) {
+		fprintf(stderr, "Failed to get stat: %s - 0x%x(%s)\n", path,
+			errno, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
 	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
-	strncpy(result->filename, path, strlen(path));
 
-	// result->info = f_stat;
+	int read_length = MAX(PATH_MAX, strlen(path));
+	strncpy(result->filename, path, read_length);
+
 	memcpy(&result->info, &f_stat, sizeof(f_stat));
 	parse_type(result, f_stat.st_mode);
 	return result;
@@ -67,28 +69,13 @@ convert_file(const char *path)
 PENTRY
 convert_directory(struct dirent *entry, DIR *dir_stream)
 {
-	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
-	bzero(result, sizeof(ENTRY));
-
-	int read_length = MAX(PATH_MAX, strlen(entry->d_name));
-	strncpy(result->filename, entry->d_name, read_length);
-
 	int fd_dir = dirfd(dir_stream);
 	if (fd_dir == EXIT_FAILURE) {
 		fprintf(stderr, "Failed to get fd from directory stream\n");
 		exit(EXIT_FAILURE);
 	}
 
-	struct stat f_stat = { 0 };
-	if (fstatat(fd_dir, entry->d_name, &f_stat, 0) == EXIT_FAILURE) {
-		fprintf(
-		    stderr,
-		    "Failed to get stat from directory stream: %s - 0x%x(%s)\n",
-		    entry->d_name, errno, strerror(errno));
-		exit(EXIT_FAILURE);
-	}
-	// result->info = f_stat;
-	memcpy(&result->info, &f_stat, sizeof(f_stat));
+	PENTRY result = convert_file(entry->d_name, fd_dir);
 	closedir(dir_stream);
 	parse_type(result, entry->d_type);
 
@@ -117,7 +104,7 @@ travel_directory(const POPTIONS options)
 				closedir(d);
 			}
 		} else {
-			newNode = convert_file(path);
+			newNode = convert_file(path, 0);
 			if (root != NULL)
 				root->next = newNode;
 			newNode->prev = root;

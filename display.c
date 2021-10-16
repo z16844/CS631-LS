@@ -155,7 +155,7 @@ add_indicators(PENTRY root)
 	}
 }
 void
-initialize(PENTRY root)
+initialize_setting(PENTRY root)
 {
 	PENTRY cursor = root;
 	struct winsize w;
@@ -194,7 +194,7 @@ initialize(PENTRY root)
 void
 print_entries(PENTRY root, const POPTIONS options)
 {
-	initialize(root);
+	initialize_setting(root);
 	if (options->WithTypeSymbols) {	   // -F
 		add_indicators(root);
 	}

@@ -57,7 +57,9 @@ convert_file(const char *path)
 	}
 	PENTRY result = (PENTRY)calloc_checked(1, sizeof(ENTRY));
 	strncpy(result->filename, path, strlen(path));
-	result->info = f_stat;
+
+	// result->info = f_stat;
+	memcpy(&result->info, &f_stat, sizeof(f_stat));
 	parse_type(result, f_stat.st_mode);
 	return result;
 }
@@ -85,7 +87,8 @@ convert_directory(struct dirent *entry, DIR *dir_stream)
 		    entry->d_name, errno, strerror(errno));
 		exit(EXIT_FAILURE);
 	}
-	result->info = f_stat;
+	// result->info = f_stat;
+	memcpy(&result->info, &f_stat, sizeof(f_stat));
 	closedir(dir_stream);
 	parse_type(result, entry->d_type);
 

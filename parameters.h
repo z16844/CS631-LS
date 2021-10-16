@@ -9,12 +9,12 @@ typedef struct _OPTIONS
 	bool AllEntriesIncludeDirectory;		  // -a***
 	bool OrderByLastChanged;			  // -c***
 	bool DirectoriesAsPlainFiles;			  // -d
-	bool WithTypeSymbols;				  // -F
+	bool WithTypeSymbols;				  // -F***
 	bool NotSortedOutput;				  // -f***
 	bool HumanReadableFormat;			  // -h
 	bool ShowInodeNumber;				  // -i
 	bool SizeFormatAsKb;				  // -k
-	bool ListInLongFormat;				  // -l
+	bool ListInLongFormat;				  // -l***
 	bool ShowAsUidAndGid;				  // -n
 	bool ForceDisplayingNonPrintableLetters;	  // -q
 	bool ListRecursivelySubDirectoriesEncountered;	  // -R

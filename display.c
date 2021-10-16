@@ -192,16 +192,17 @@ initialize_setting(PENTRY root)
 			setting->maxFilenameLen = name_len;
 
 		/* TODO: -n options (options->ShowAsUidAndGid) */
-		// char *username = getUserName(cursor->info.st_uid);
-		// if (strlen(username) > setting->maxUserLen)
-		// 	setting->maxUserLen = strlen(username);
-		// free(username);
-		setting->maxUserLen = 8;
-		// char *group_name = getGroupName(cursor->info.st_gid);
-		// if (strlen(group_name) > setting->maxGroupLen)
-		// 	setting->maxGroupLen = strlen(group_name);
-		// free(group_name);
-		setting->maxGroupLen = 5;
+		char *username = getUserName(cursor->info.st_uid);
+		if (strlen(username) > setting->maxUserLen)
+			setting->maxUserLen = strlen(username);
+		// /* TESTING CODE TO BYPASS SIGSEGV */
+		// setting->maxUserLen = 8;
+
+		char *group_name = getGroupName(cursor->info.st_gid);
+		if (strlen(group_name) > setting->maxGroupLen)
+			setting->maxGroupLen = strlen(group_name);
+		// /* TESTING CODE TO BYPASS SIGSEGV */
+		// setting->maxGroupLen = 5;
 
 		/* TODO: -h options (options->HumanReadableFormat) */
 		char *size = itoa(cursor->info.st_size);
@@ -213,13 +214,14 @@ initialize_setting(PENTRY root)
 		if (strlen(hardlinks) > setting->maxHardLinks)
 			setting->maxHardLinks = strlen(hardlinks);
 		free(hardlinks);
+		setting->numberOfEntries++;
 		cursor = cursor->next;
 	}
 }
 void
 print_entries(PENTRY root, const POPTIONS options)
 {
-	initialize_setting(root);
+	// initialize_setting(root);
 	if (options->WithTypeSymbols) {	   // -F
 		add_indicators(root);
 	}

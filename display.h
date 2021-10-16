@@ -18,6 +18,13 @@ typedef struct display_format_setting
 	int maxFilenameLen;
 } FORM_SETTING;
 
+char *
+getGroupName(gid_t gid);
+
+char *
+getUserName(uid_t uid);
+void
+initialize_setting(PENTRY root);
 void
 print_entries(PENTRY root, const POPTIONS options);
 

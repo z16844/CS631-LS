@@ -1,4 +1,4 @@
-CFLAGS=-Wall -Werror -Wextra -std=c99 -g
+CFLAGS=-Wall -Werror -Wextra -std=c99 -g -Wno-unused-variable
 OBJS=main.o parameters.o file_listing.o misc.o sorting.o display.o
 TARGET=ls
 

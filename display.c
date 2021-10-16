@@ -26,8 +26,8 @@ itoa(int value)
 char *
 getGroupName(gid_t gid)
 {
-	struct group *g = getgrgid(gid);
-	if (g != NULL) {
+	struct group *g = NULL;
+	if ((g = getgrgid(gid)) != NULL) {
 		return g->gr_name;
 	}
 	if (errno != 0) {
@@ -36,9 +36,7 @@ getGroupName(gid_t gid)
 			gid, errno, strerror(errno));
 		exit(EXIT_FAILURE);
 	} else {
-		fprintf(stderr, "Failed to find group name from gid: %d\n",
-			gid);
-		exit(EXIT_FAILURE);
+		return itoa(gid);
 	}
 }
 char *
@@ -54,8 +52,7 @@ getUserName(uid_t uid)
 			uid, errno, strerror(errno));
 		exit(EXIT_FAILURE);
 	} else {
-		fprintf(stderr, "Failed to find user name from uid: %d\n", uid);
-		exit(EXIT_FAILURE);
+		return itoa(uid);
 	}
 }
 /*
@@ -116,14 +113,17 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	char *hardlinks = itoa(entry->info.st_nlink);
 	offset += (10 + 1 + setting->maxHardLinks) - strlen(hardlinks);
 	strncpy(&(line_buf[offset]), hardlinks, setting->maxHardLinks);
+	free(hardlinks);
 
 	char *username = getUserName(entry->info.st_uid);
 	offset += setting->maxUserLen - strlen(username);
 	strncpy(&(line_buf[offset]), username, strlen(username));
+	free(username);
 
-	char *group = getGroupName(entry->info.st_gid);
-	offset += setting->maxGroupLen - strlen(group);
-	strncpy(&(line_buf[offset]), group, strlen(group));
+	char *group_name = getGroupName(entry->info.st_gid);
+	offset += setting->maxGroupLen - strlen(group_name);
+	strncpy(&(line_buf[offset]), group_name, strlen(group_name));
+	free(group_name);
 
 	/* TODO: -h options (options->HumanReadableFormat) */
 	if (options->HumanReadableFormat) {
@@ -131,6 +131,7 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	char *size = itoa(entry->info.st_size);
 	offset += setting->maxSizeLen - strlen(size);
 	strncpy(&(line_buf[offset]), size, strlen(size));
+	free(size);
 
 	/* TODO: build DateTime*/
 	offset += len_DateTime + 1;
@@ -147,7 +148,6 @@ add_indicators(PENTRY root)
 	while (cursor != NULL) {
 		new_name = (char *)calloc_checked(strlen(cursor->filename) + 2,
 						  sizeof(char));
-		bzero(new_name, sizeof(new_name));
 
 		switch (cursor->type) {
 		case Directory:
@@ -192,20 +192,25 @@ initialize_setting(PENTRY root)
 			setting->maxFilenameLen = name_len;
 
 		/* TODO: -n options (options->ShowAsUidAndGid) */
-		// char *user_name = getUserName(cursor->info.st_uid);
-		// if (strlen(user_name) > setting->maxUserLen)
-		// 	setting->maxUserLen = strlen(user_name);
-		// char *group_name = getGroupName(cursor->info.st_gid);
-		// if (strlen(group_name) > setting->maxUserLen)
-		// 	setting->maxGroupLen = strlen(group_name);
+		char *username = getUserName(cursor->info.st_uid);
+		if (strlen(username) > setting->maxUserLen)
+			setting->maxUserLen = strlen(username);
+		free(username);
+		char *group_name = getGroupName(cursor->info.st_gid);
+		if (strlen(group_name) > setting->maxUserLen)
+			setting->maxGroupLen = strlen(group_name);
+		free(group_name);
 
 		/* TODO: -h options (options->HumanReadableFormat) */
-		if (strlen(itoa(cursor->info.st_size)) > setting->maxSizeLen)
+		char *size = itoa(cursor->info.st_size);
+		if (strlen(size) > setting->maxSizeLen)
 			setting->maxSizeLen = cursor->info.st_size;
-
+		free(size);
 		/* Check the number of max hard links */
-		if (strlen(itoa(cursor->info.st_nlink)) > setting->maxHardLinks)
+		char *hardlinks = itoa(cursor->info.st_nlink);
+		if (strlen(hardlinks) > setting->maxHardLinks)
 			setting->maxHardLinks = cursor->info.st_nlink;
+		free(hardlinks);
 		cursor = cursor->next;
 	}
 }

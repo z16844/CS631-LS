@@ -11,7 +11,7 @@ typedef struct _OPTIONS
 	bool DirectoriesAsPlainFiles;			  // -d
 	bool WithTypeSymbols;				  // -F***
 	bool NotSortedOutput;				  // -f***
-	bool HumanReadableFormat;			  // -h
+	bool HumanReadableFormat;			  // -h***
 	bool ShowInodeNumber;				  // -i
 	bool SizeFormatAsKb;				  // -k
 	bool ListInLongFormat;				  // -l***

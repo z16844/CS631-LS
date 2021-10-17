@@ -9,7 +9,7 @@ clean:
 
 $(TARGET): $(OBJS)
 	mkdir -p ./bin
-	gcc -o ./bin/$@ $(OBJS)
+	gcc -lm -o ./bin/$@ $(OBJS)
 
 main.o: display.h sorting.h file_listing.h parameters.h main.c
 parameters.o: misc.h parameters.h parameters.c

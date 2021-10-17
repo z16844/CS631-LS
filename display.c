@@ -1,5 +1,6 @@
 #include "display.h"
 
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +18,36 @@ FORM_SETTING *setting = NULL;
  */
 char *filetype_indicator = "dlspw-aAbc";
 char *filetype_symbols = "/@=|%%\0\0\0\0\0";
+
+char *
+asHumanReadable(size_t value)
+{
+	char *converted;
+	char unit = '\0';
+	const unsigned long UNIT_KB = 1024;
+	const unsigned long UNIT_MB = 1024 * UNIT_KB;
+	const unsigned long UNIT_GB = 1024 * UNIT_MB;
+	const unsigned long UNIT_TB = 1024 * UNIT_GB;
+
+	if (value > UNIT_TB) {
+		unit = 'T';
+		converted = dtoa(round(value / UNIT_TB * 10) / 10);
+	} else if (value > UNIT_GB) {
+		unit = 'G';
+		converted = dtoa(round(value / UNIT_GB * 10) / 10);
+	} else if (value > UNIT_MB) {
+		unit = 'M';
+		converted = dtoa(round(value / UNIT_MB * 10) / 10);
+	} else if (value > UNIT_KB) {
+		unit = 'K';
+		converted = dtoa(round(value / UNIT_KB * 10) / 10);
+	} else {
+		unit = 'B';
+		converted = itoa(value);
+	}
+	char *result = strncat(converted, &unit, 1);
+	return result;
+}
 
 void
 print_long_format(PENTRY entry, const POPTIONS options)
@@ -86,10 +117,11 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	    strlen(username) + 1 + setting->maxGroupLen - strlen(group_name);
 	strncpy(&(line_buf[offset]), group_name, strlen(group_name));
 
+	char *size;
 	if (options->HumanReadableFormat) {
-		/* TODO: -h options (options->HumanReadableFormat) */
-	}
-	char *size = itoa(entry->info.st_size);
+		size = asHumanReadable(entry->info.st_size);
+	} else
+		size = itoa(entry->info.st_size);
 	offset += strlen(group_name) + 1 + setting->maxSizeLen - strlen(size);
 	strncpy(&(line_buf[offset]), size, strlen(size));
 	free(size);

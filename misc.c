@@ -7,7 +7,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-
 extern int errno;
 
 void *
@@ -36,6 +35,18 @@ calloc_checked(int count, size_t type_size)
 
 	bzero(allocated, count * type_size);
 	return allocated;
+}
+char *
+dtoa(double value)
+{
+	char *result;
+	char buf[15] = { 0 };
+	size_t len = snprintf(buf, 10, "%.1g", value);
+
+	/* snprintf doesn't count NULL-termination */
+	result = (char *)calloc_checked(len + 1, sizeof(char));
+	strncpy(result, buf, len);
+	return result;
 }
 char *
 itoa(int value)

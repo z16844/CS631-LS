@@ -1,3 +1,5 @@
+
+#include <math.h>
 #include <stdio.h>
 #include <time.h>
 
@@ -6,6 +8,9 @@
 
 void *
 calloc_checked(int count, size_t type_size);
+
+char *
+dtoa(double value);
 
 char *
 itoa(int value);

@@ -23,5 +23,7 @@ getUserName(uid_t uid);
 
 char *
 getGroupName(gid_t gid);
+char *
+asHumanReadable(size_t value);
 
 #endif /* !_MISC_H_ */

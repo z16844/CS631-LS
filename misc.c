@@ -102,3 +102,33 @@ getUserName(uid_t uid)
 		return itoa(uid);
 	}
 }
+
+char *
+asHumanReadable(size_t value)
+{
+	char *converted;
+	char unit = '\0';
+	const unsigned long UNIT_KB = 1024;
+	const unsigned long UNIT_MB = 1024 * UNIT_KB;
+	const unsigned long UNIT_GB = 1024 * UNIT_MB;
+	const unsigned long UNIT_TB = 1024 * UNIT_GB;
+
+	if (value > UNIT_TB) {
+		unit = 'T';
+		converted = dtoa(value / (double)UNIT_TB);
+	} else if (value > UNIT_GB) {
+		unit = 'G';
+		converted = dtoa(value / (double)UNIT_GB);
+	} else if (value > UNIT_MB) {
+		unit = 'M';
+		converted = dtoa(value / (double)UNIT_MB);
+	} else if (value > UNIT_KB) {
+		unit = 'K';
+		converted = dtoa(value / (double)UNIT_KB);
+	} else {
+		unit = 'B';
+		converted = itoa(value);
+	}
+	char *result = strncat(converted, &unit, 1);
+	return result;
+}

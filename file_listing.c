@@ -157,8 +157,12 @@ update_metadata(PENTRY entry, const POPTIONS options)
 		settings->maxInodeLen = len_inode;
 	free(inode);
 
-	/* TODO: -h options (options->HumanReadableFormat) */
-	char *size = itoa(entry->info.st_size);
+	char *size;
+	if (options->HumanReadableFormat)
+		size = asHumanReadable(entry->info.st_size);
+	else
+		size = itoa(entry->info.st_size);
+
 	size_t len_size = strlen(size);
 	if (len_size > settings->maxSizeLen)
 		settings->maxSizeLen = len_size;

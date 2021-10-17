@@ -62,9 +62,9 @@ itoa(int value)
 char *
 parse_timestamp(time_t *time)
 {
-	/* TODO: TZ-based time */
 	char *result = (char *)calloc_checked(13, sizeof(char));
 	struct tm *t;
+	/* TZ-based time */
 	t = localtime(time);
 
 	strftime(result, 13, "%b %e %R", t);

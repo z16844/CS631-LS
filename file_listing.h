@@ -39,6 +39,7 @@ typedef struct metadata
 	int totalLines;
 	int ColumnsOfTerminal;
 	// from file
+	unsigned int maxInodeLen;
 	unsigned int maxHardLinks;
 	unsigned int maxUserLen;
 	unsigned int maxGroupLen;

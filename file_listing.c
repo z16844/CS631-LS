@@ -151,6 +151,12 @@ update_metadata(PENTRY entry, const POPTIONS options)
 	if (name_len > settings->maxFilenameLen)
 		settings->maxFilenameLen = name_len;
 
+	char *inode = itoa(entry->info.st_ino);
+	size_t len_inode = strlen(inode);
+	if (len_inode > settings->maxInodeLen)
+		settings->maxInodeLen = len_inode;
+	free(inode);
+
 	/* TODO: -h options (options->HumanReadableFormat) */
 	char *size = itoa(entry->info.st_size);
 	size_t len_size = strlen(size);

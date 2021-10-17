@@ -90,6 +90,10 @@ convert_directory(struct dirent *entry, DIR *dir_stream, const POPTIONS options)
 PENTRY
 travel_directory(const POPTIONS options)
 {
+	/* TODO: Symlinks */
+	/* TODO: recursive directories(-R) */
+	/* TODO: listed directories (-d) */
+	/* TODO: Total blocks on the top */
 
 	PENTRY root = NULL, newNode = NULL;
 	DIR *d;

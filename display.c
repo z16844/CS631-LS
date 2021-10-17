@@ -68,10 +68,10 @@ print_long_format(PENTRY entry, const POPTIONS options)
 		}
 	}
 	offset = 10;
-	line_buf[offset] = '\x20';
+	line_buf[offset++] = '\x20';
 
 	char *hardlinks = itoa(entry->info.st_nlink);
-	offset += 1 + setting->maxHardLinks - strlen(hardlinks);
+	offset += setting->maxHardLinks - strlen(hardlinks);
 	strncpy(&(line_buf[offset]), hardlinks, setting->maxHardLinks);
 	free(hardlinks);
 

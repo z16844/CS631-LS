@@ -41,7 +41,7 @@ dtoa(double value)
 {
 	char *result;
 	char buf[15] = { 0 };
-	size_t len = snprintf(buf, 10, "%.1g", value);
+	size_t len = snprintf(buf, 10, "%.01f", value);
 
 	/* snprintf doesn't count NULL-termination */
 	result = (char *)calloc_checked(len + 1, sizeof(char));

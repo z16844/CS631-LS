@@ -31,16 +31,16 @@ asHumanReadable(size_t value)
 
 	if (value > UNIT_TB) {
 		unit = 'T';
-		converted = dtoa(round(value / UNIT_TB * 10) / 10);
+		converted = dtoa(value / (double)UNIT_TB);
 	} else if (value > UNIT_GB) {
 		unit = 'G';
-		converted = dtoa(round(value / UNIT_GB * 10) / 10);
+		converted = dtoa(value / (double)UNIT_GB);
 	} else if (value > UNIT_MB) {
 		unit = 'M';
-		converted = dtoa(round(value / UNIT_MB * 10) / 10);
+		converted = dtoa(value / (double)UNIT_MB);
 	} else if (value > UNIT_KB) {
 		unit = 'K';
-		converted = dtoa(round(value / UNIT_KB * 10) / 10);
+		converted = dtoa(value / (double)UNIT_KB);
 	} else {
 		unit = 'B';
 		converted = itoa(value);

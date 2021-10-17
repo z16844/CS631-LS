@@ -6,6 +6,7 @@
 #include <string.h>
 #include <strings.h>
 #include <time.h>
+#include <unistd.h>
 
 #include "misc.h"
 
@@ -43,32 +44,10 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	memset(line_buf, '\x20', buf_size);
 	line_buf[buf_size - 1] = '\x00';
 
-	/* TODO: Sticky bits */
-	/* FileType */
-	line_buf[0] = filetype_indicator[entry->type];
-	/* permission indicator */
-	int i;
-	int umask = entry->info.st_mode & 0777;
-	for (i = 1; i < 10; i++) {
-		bool bit = ((0400 >> (i - 1)) & umask) != 0;
-		if (!bit) {
-			line_buf[i] = '-';
-			continue;
-		}
-		switch (i % 3) {
-		case 1:
-			line_buf[i] = 'r';
-			break;
-		case 2:
-			line_buf[i] = 'w';
-			break;
-		case 3:
-			line_buf[i] = 'x';
-			break;
-		}
-	}
-	offset = 10;
-	line_buf[offset++] = '\x20';
+	char mode[11] = { 0 };
+	strmode(entry->info.st_mode, mode);
+	offset = strlen(mode);
+	strncpy(line_buf, mode, offset);
 
 	char *hardlinks = itoa(entry->info.st_nlink);
 	offset += setting->maxHardLinks - strlen(hardlinks);

@@ -47,9 +47,13 @@ print_long_format(PENTRY entry, const POPTIONS options)
 		len_blank = 0;
 	}
 	if (options->DisplayByBlockSize) {    // -s
-		char *blocks = itoa(entry->info.st_blocks);
-		int len_blocks = strlen(blocks);
+		char *blocks;
+		if (options->SizeFormatAsKb)
+			blocks = itoa((entry->info.st_blocks) / 2);
+		else
+			blocks = itoa(entry->info.st_blocks);
 
+		int len_blocks = strlen(blocks);
 		len_blank = setting->maxBlockSizeLen - len_blocks;
 		for (; len_blank > 0; len_blank--)
 			printf(" ");
@@ -131,31 +135,104 @@ add_indicators(PENTRY root)
 		cursor = cursor->next;
 	}
 }
+size_t
+print_padding(size_t size)
+{
+	size_t written = 0;
+	while (size-- > 0)
+		printf(" ");
+	return written;
+}
+void
+print_grid(PENTRY root, const POPTIONS options)
+{
 
+	PENTRY *result =
+	    (PENTRY *)calloc_checked(setting->numberOfEntries, sizeof(PENTRY));
+	PENTRY cursor = root;
+
+	int columnsPerItem = 1;
+	if (options->ShowInodeNumber)
+		columnsPerItem++;
+	if (options->DisplayByBlockSize)
+		columnsPerItem++;
+
+	int columns =
+	    setting->ColumnsOfTerminal / (setting->maxFilenameLen + 1);
+	columns /= columnsPerItem;
+
+	int rows = setting->numberOfEntries / columns;
+	rows += setting->numberOfEntries % columns > 0 ? 1 : 0;
+
+	// re-align as grid
+	for (int c = 0; c < columns; c++) {
+		for (int r = 0; r < rows; r++) {
+			if ((columns * r) + c >= setting->numberOfEntries)
+				break;
+
+			result[(columns * r) + c] = cursor;
+
+			if (!cursor->next)
+				break;
+			cursor = cursor->next;
+		}
+	}
+	char *buf = NULL;
+	size_t len = 0;
+	for (int i = 0; i < setting->numberOfEntries; i++) {
+		cursor = result[i];
+		if (options->ShowInodeNumber) {
+			buf = itoa(cursor->info.st_ino);
+			len = strlen(buf);
+			print_padding(setting->maxInodeLen - len);
+			printf("%s ", buf);
+			free(buf);
+		}
+
+		if (options->DisplayByBlockSize) {
+			if (options->SizeFormatAsKb)
+				buf = itoa(cursor->info.st_blocks / 2);
+			else
+				buf = itoa(cursor->info.st_blocks);
+			len = strlen(buf);
+			print_padding(setting->maxBlockSizeLen - len);
+			printf("%s ", buf);
+			free(buf);
+		}
+
+		buf = NULL;
+		len = strlen(cursor->filename);
+		printf("%s ", cursor->filename);
+		print_padding(setting->maxFilenameLen - len);
+		if ((i + 1) % columns == 0)
+			printf("\n");
+	}
+	free(result);
+}
 void
 print_entries(PENTRY root, const POPTIONS options)
 {
-	/* TODO: table-style display */
 	setting = get_metadata();
 	if (options->WithTypeSymbols) {	   // -F
 		add_indicators(root);
 	}
 	PENTRY cursor = root;
-	if (options->DisplayByBlockSize) {
-		printf("total %d\n", (setting->sumBlocks / 2));
-	} else if (options->ListInLongFormat) {
+	if (options->DisplayByBlockSize) {	// -s
+		if (options->SizeFormatAsKb)	// -k
+			printf("total %d\n", (setting->sumBlocks / 2));
+		else
+			printf("total %d\n", (setting->sumBlocks));
+	} else if (options->ListInLongFormat) {	   // -l
 		printf("total %d\n", setting->sumBlocks);
 	}
-	while (cursor != NULL) {
-		if (options->ListInLongFormat) {    // -l
+
+	if (options->ListInLongFormat) {
+		while (cursor != NULL) {
 			print_long_format(cursor, options);
-		} else {
-			if (options->DisplayByBlockSize) {
-				printf("%ld ", cursor->info.st_blocks);
-			}
-			printf("%s\t", cursor->filename);
+			cursor = cursor->next;
 		}
-		cursor = cursor->next;
+	} else {
+		print_grid(root, options);
 	}
 	printf("\n");
 }

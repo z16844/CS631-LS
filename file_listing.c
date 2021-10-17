@@ -94,7 +94,6 @@ travel_directory(const POPTIONS options)
 	/* TODO: Symlinks */
 	/* TODO: recursive directories(-R) */
 	/* TODO: listed directories (-d) */
-	/* TODO: Total blocks on the top */
 
 	PENTRY root = NULL, newNode = NULL;
 	DIR *d;

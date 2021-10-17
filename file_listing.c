@@ -69,6 +69,7 @@ convert_file(const char *path, int fd_dir, const POPTIONS options)
 
 	memcpy(&result->info, &f_stat, sizeof(f_stat));
 	parse_type(result, f_stat.st_mode);
+
 	update_metadata(result, options);
 	return result;
 }
@@ -147,9 +148,19 @@ is_visible(const POPTIONS options, struct dirent *entry)
 void
 update_metadata(PENTRY entry, const POPTIONS options)
 {
-	if (settings == NULL)
+	if (settings == NULL) {
 		settings =
 		    (FORM_SETTING *)calloc_checked(1, sizeof(FORM_SETTING));
+		if (options->SizeFormatAsKb) {
+			settings->UnitblockSize = 2;	// 512 * 2 = 1024
+		} else {
+			// int empty;
+			// getbsize(&empty, &(settings->UnitblockSize));
+			// settings->UnitblockSize /= 512;
+			/* NEED TO CHECK: entry->info.st_blksize */
+			settings->UnitblockSize = entry->info.st_blksize;
+		}
+	}
 
 	int name_len = strlen(entry->filename);
 	if (name_len > settings->maxFilenameLen)
@@ -171,6 +182,12 @@ update_metadata(PENTRY entry, const POPTIONS options)
 	if (len_size > settings->maxSizeLen)
 		settings->maxSizeLen = len_size;
 	free(size);
+
+	char *blocks = itoa(entry->info.st_blocks);
+	size_t len_blocks = strlen(blocks);
+	if (len_blocks > settings->maxBlockSizeLen)
+		settings->maxBlockSizeLen = len_blocks;
+	settings->sumBlocks += entry->info.st_blocks;
 
 	char *hardlinks = itoa(entry->info.st_nlink);
 	size_t len_hardlinks = strlen(hardlinks);

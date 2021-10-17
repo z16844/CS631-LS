@@ -20,7 +20,7 @@ typedef struct _OPTIONS
 	bool ListRecursivelySubDirectoriesEncountered;	  // -R
 	bool OrderReversal;				  // -r***
 	bool OrderDesceningBySize;			  //-S***
-	bool DisplayByBlockSize;			  // -s
+	bool DisplayByBlockSize;			  // -s***
 	bool OrderByLastModified;			  // -t***
 	bool OrderByLastAccess;				  // -u***
 	bool ForceRawPrintingOfNonPrintable;		  // -w

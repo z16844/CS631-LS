@@ -25,6 +25,7 @@ enum filetype
 
 typedef struct ENTRY
 {
+	long blocks;
 	struct stat info;
 	char *filename;
 	enum filetype type;
@@ -38,12 +39,15 @@ typedef struct metadata
 	int numberOfEntries;
 	int totalLines;
 	int ColumnsOfTerminal;
+	int UnitblockSize;
+	int sumBlocks;
 	// from file
 	unsigned int maxInodeLen;
 	unsigned int maxHardLinks;
 	unsigned int maxUserLen;
 	unsigned int maxGroupLen;
 	unsigned int maxSizeLen;
+	unsigned int maxBlockSizeLen;
 	int maxFilenameLen;
 } FORM_SETTING;
 

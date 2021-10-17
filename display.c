@@ -35,6 +35,7 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	 * pathname
 	 */
 	int len_blank = 0;
+
 	if (options->ShowInodeNumber) {	   // -i
 		char *inode = itoa(entry->info.st_ino);
 		int lenInode = strlen(inode);
@@ -134,17 +135,27 @@ add_indicators(PENTRY root)
 void
 print_entries(PENTRY root, const POPTIONS options)
 {
+	/* TODO: table-style display */
 	setting = get_metadata();
 	if (options->WithTypeSymbols) {	   // -F
 		add_indicators(root);
 	}
 	PENTRY cursor = root;
+	if (options->DisplayByBlockSize) {
+		printf("total %d\n", (setting->sumBlocks / 2));
+	} else if (options->ListInLongFormat) {
+		printf("total %d\n", setting->sumBlocks);
+	}
 	while (cursor != NULL) {
 		if (options->ListInLongFormat) {    // -l
 			print_long_format(cursor, options);
 		} else {
+			if (options->DisplayByBlockSize) {
+				printf("%ld ", cursor->info.st_blocks);
+			}
 			printf("%s\t", cursor->filename);
 		}
 		cursor = cursor->next;
 	}
+	printf("\n");
 }

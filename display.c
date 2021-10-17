@@ -54,22 +54,24 @@ print_long_format(PENTRY entry, const POPTIONS options)
 {
 	int offset = -1;
 	int len_DateTime = 11;
-	char line_buf[10			/* filetype and permission*/
-		      + 1			/* blank */
-		      + setting->maxHardLinks	/* hardlink field */
-		      + 1			/* blank */
-		      + setting->maxUserLen	/* owner field */
-		      + 1			/* blank */
-		      + setting->maxGroupLen	/* group field */
-		      + 1			/* blank */
-		      + setting->maxSizeLen	/* file size field */
-		      + 1			/* blank */
-		      + len_DateTime		/* DateTime field */
-		      + 1			/* blank before filename*/
-		      + strlen(entry->filename) /* Filename field */
-	];
-	memset(line_buf, '\x20', sizeof(line_buf));
-	line_buf[sizeof(line_buf) - 1] = '\x00';
+	int buf_size = 10			 /* filetype and permission*/
+		       + 1			 /* blank */
+		       + setting->maxHardLinks	 /* hardlink field */
+		       + 1			 /* blank */
+		       + setting->maxUserLen	 /* owner field */
+		       + 1			 /* blank */
+		       + setting->maxGroupLen	 /* group field */
+		       + 1			 /* blank */
+		       + setting->maxSizeLen	 /* file size field */
+		       + 1			 /* blank */
+		       + len_DateTime		 /* DateTime field */
+		       + 1			 /* blank before filename*/
+		       + strlen(entry->filename) /* Filename field */
+		       + 1			 /* NULL-Terminator */
+	    ;
+	char *line_buf = (char *)calloc_checked(buf_size, sizeof(char));
+	memset(line_buf, '\x20', buf_size);
+	line_buf[buf_size - 1] = '\x00';
 
 	/* TODO: Sticky bits */
 	/* FileType */
@@ -135,8 +137,21 @@ print_long_format(PENTRY entry, const POPTIONS options)
 	int lenFilename = strlen(entry->filename);
 	strncpy(&(line_buf[offset]), entry->filename, lenFilename);
 	offset += lenFilename;
-	line_buf[offset] = '\x00';
 
+	if (options->ShowInodeNumber) {
+		char *inode = itoa(entry->info.st_ino);
+		int lenInode = strlen(inode);
+		char *inodeField = (char *)calloc_checked(
+		    setting->maxInodeLen + 1, sizeof(char));
+		offset += setting->maxInodeLen - lenInode;
+		strncpy(&inodeField[setting->maxInodeLen - lenInode], inode,
+			lenInode);
+		inodeField[lenInode] = '\x20';
+		line_buf = strncat(inodeField, line_buf, strlen(line_buf));
+		offset += lenInode + 1;
+		free(inodeField);
+	}
+	line_buf[offset] = '\x00';
 	printf(line_buf);
 	printf("\n");
 }
@@ -187,6 +202,4 @@ print_entries(PENTRY root, const POPTIONS options)
 		}
 		cursor = cursor->next;
 	}
-
-	printf("\n");
 }

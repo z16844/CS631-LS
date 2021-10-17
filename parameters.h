@@ -12,7 +12,7 @@ typedef struct _OPTIONS
 	bool WithTypeSymbols;				  // -F***
 	bool NotSortedOutput;				  // -f***
 	bool HumanReadableFormat;			  // -h***
-	bool ShowInodeNumber;				  // -i
+	bool ShowInodeNumber;				  // -i***
 	bool SizeFormatAsKb;				  // -k
 	bool ListInLongFormat;				  // -l***
 	bool ShowAsUidAndGid;				  // -n***
